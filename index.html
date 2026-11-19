@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Barbeque Nation | Live Pricing Simulator</title>
+<style>
+:root{--navy:#303c50;--slate:#556a8e;--cream:#fcf8e3;--pale:#bbc3d2;--pink:#eeccd6;--rose:#f4a4be;--yellow:#ffe471;--yellow2:#fff3c0;--ink:#303c50;--muted:#69758b;--line:#ddd7c5;--white:#fffef8;--green:#e2ebdd}
+*{box-sizing:border-box}body{margin:0;background-color:var(--cream);background-image:linear-gradient(to right,rgba(215,210,190,.32) 1px,transparent 1px),linear-gradient(to bottom,rgba(215,210,190,.32) 1px,transparent 1px);background-size:28px 28px;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:34px 24px 48px}.eyebrow{font-size:11px;letter-spacing:1.7px;font-weight:700;color:var(--slate);text-transform:uppercase}.header{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:24px}.header h1{font-size:clamp(26px,4vw,42px);line-height:1.08;margin:10px 0 8px;color:var(--navy)}.header p{margin:0;color:var(--muted);font-size:15px;line-height:1.5;max-width:720px}.tag{background:var(--pink);color:var(--navy);border-radius:30px;padding:9px 14px;font-size:11px;font-weight:700;white-space:nowrap;margin-top:8px}
+.panel{background:rgba(255,254,248,.94);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 8px 24px rgba(48,60,80,.06)}.controls{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-bottom:18px}.price-row{display:flex;justify-content:space-between;align-items:center;gap:14px}.price-row label{font-size:14px;font-weight:700;color:var(--slate)}.price{font-size:36px;font-weight:800;color:var(--navy);letter-spacing:-1px}.range-wrap{margin:20px 4px 0}.range{appearance:none;width:100%;height:10px;border-radius:999px;background:linear-gradient(to right,var(--slate) 0%,var(--slate) var(--pct),#d9dce3 var(--pct),#d9dce3 100%);outline:none;cursor:pointer}.range::-webkit-slider-thumb{appearance:none;width:25px;height:25px;border-radius:50%;background:var(--rose);border:3px solid var(--navy);box-shadow:0 2px 5px rgba(0,0,0,.15)}.range::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--rose);border:3px solid var(--navy);box-shadow:0 2px 5px rgba(0,0,0,.15)}.ticks{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:9px}.quick{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}.quick button{border:1px solid #cfd4df;background:var(--white);border-radius:999px;padding:8px 12px;color:var(--navy);font-weight:700;font-size:12px;cursor:pointer}.quick button:hover{background:var(--yellow2);border-color:#d8c57c}.price-context{display:flex;flex-direction:column;justify-content:center;gap:9px}.context-line{display:flex;align-items:center;gap:11px;color:var(--muted);font-size:13px}.dot{width:10px;height:10px;border-radius:50%;background:var(--rose);flex:none}.context-line strong{color:var(--navy)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.kpi{border-radius:15px;padding:18px;background:var(--white);border:1px solid var(--line);min-height:118px}.kpi:nth-child(1){border-top:5px solid var(--pale)}.kpi:nth-child(2){border-top:5px solid var(--yellow)}.kpi:nth-child(3){border-top:5px solid var(--rose)}.kpi:nth-child(4){border-top:5px solid #b9cdb2}.kpi .label{font-size:10px;letter-spacing:1px;color:var(--slate);font-weight:700;text-transform:uppercase}.kpi .value{font-size:clamp(22px,3vw,30px);font-weight:800;color:var(--navy);margin:10px 0 4px}.kpi .note{font-size:11px;color:var(--muted)}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px}.chart-panel{padding:16px 16px 12px}.chart-title{font-weight:700;font-size:14px;color:var(--navy);margin:2px 0 10px}.chart{width:100%;display:block;height:auto}.readout{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}.readout .panel{padding:18px 22px}.readout h3{font-size:13px;margin:0 0 8px;color:var(--slate);text-transform:uppercase;letter-spacing:1px}.readout p{margin:0;font-size:13px;line-height:1.55;color:var(--muted)}.readout strong{color:var(--navy)}.callout{background:var(--yellow2);border-color:#ddcf96}.note{font-size:11px;line-height:1.55;color:var(--muted);margin-top:18px}.links{margin-top:16px;display:flex;gap:12px;flex-wrap:wrap}.links a{color:var(--navy);font-weight:700;font-size:12px;text-decoration:none;border-bottom:1px solid var(--slate);padding-bottom:2px}.links a:hover{color:#87616d}.formula{font-family:Georgia,serif;font-style:italic;background:#f8f4df;border-radius:10px;padding:9px 12px;color:var(--navy);display:inline-block;margin-top:8px;font-size:13px}
+@media(max-width:850px){.controls,.charts,.readout{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.header{display:block}.tag{display:inline-block}}
+@media(max-width:480px){.wrap{padding:22px 13px 36px}.panel{padding:17px}.kpis{gap:8px}.kpi{padding:12px;min-height:110px}.price{font-size:30px}}
+
+.elasticity-section{margin-top:18px}
+.elasticity-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px}
+.elasticity-head h2{font-size:21px;line-height:1.2;margin:7px 0 7px;color:var(--navy)}
+.elasticity-head p{margin:0;max-width:760px;color:var(--muted);font-size:13px;line-height:1.55}
+.elasticity-pill{background:var(--pink);color:var(--navy);border-radius:999px;padding:9px 13px;font-size:10px;font-weight:800;letter-spacing:.7px;white-space:nowrap}
+.elasticity-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.elasticity-card{appearance:none;text-align:left;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px 15px;cursor:pointer;color:var(--ink);transition:border-color .15s,transform .15s,box-shadow .15s;min-width:0}
+.elasticity-card:hover{transform:translateY(-2px);border-color:#b6bfd0;box-shadow:0 6px 16px rgba(48,60,80,.07)}
+.elasticity-card[aria-pressed="true"]{border:2px solid var(--slate);padding:15px 14px;background:#fffdf4;box-shadow:0 5px 16px rgba(48,60,80,.08)}
+.elasticity-card .e-label{font-size:10px;letter-spacing:1px;color:var(--slate);font-weight:800;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;gap:5px}
+.elasticity-card .e-badge{font-size:9px;background:var(--yellow2);padding:4px 6px;border-radius:999px;color:var(--navy);letter-spacing:.3px}
+.elasticity-card .e-price{font-size:27px;line-height:1.1;font-weight:800;letter-spacing:-.7px;color:var(--navy);margin:13px 0 7px}
+.elasticity-card .e-caption{font-size:10px;color:var(--muted);margin-bottom:12px}
+.elasticity-card .e-metrics{display:flex;justify-content:space-between;gap:8px;border-top:1px solid #ece7d8;padding-top:10px}
+.elasticity-card .e-metrics span{display:block;font-size:9px;color:var(--muted);margin-bottom:4px}
+.elasticity-card .e-metrics strong{font-size:13px;color:var(--navy)}
+.elasticity-lower{display:grid;grid-template-columns:.9fr 1.1fr;gap:14px;margin-top:15px}
+.elasticity-box{border:1px solid var(--line);border-radius:14px;padding:17px;background:#fffef8;min-width:0}
+.elasticity-box h3{font-size:13px;color:var(--slate);letter-spacing:.7px;text-transform:uppercase;margin:0 0 9px}
+.elasticity-box p{font-size:12px;line-height:1.55;color:var(--muted);margin:0}
+.elasticity-buttons{display:flex;gap:7px;flex-wrap:wrap;margin:13px 0}
+.elasticity-buttons button{border:1px solid #cfd4df;background:var(--white);border-radius:999px;padding:7px 12px;color:var(--navy);font-weight:800;font-size:11px;cursor:pointer}
+.elasticity-buttons button[aria-pressed="true"]{background:var(--navy);color:white;border-color:var(--navy)}
+.elasticity-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}
+.elasticity-stat{background:#f8f4df;border-radius:10px;padding:10px 11px;min-width:0}
+.elasticity-stat span{display:block;font-size:9px;letter-spacing:.5px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:5px}
+.elasticity-stat strong{font-size:17px;color:var(--navy);overflow-wrap:anywhere}
+.elasticity-equation{font-family:Georgia,serif;font-style:italic;background:#f8f4df;border-radius:10px;padding:11px 12px;color:var(--navy);font-size:13px;margin-top:12px;overflow-wrap:anywhere}
+.elasticity-takeaway{border-left:4px solid var(--rose);padding:10px 12px;background:#fff7f2;border-radius:0 10px 10px 0;margin-top:12px;font-size:11px;line-height:1.55;color:var(--muted)}
+.elasticity-takeaway strong{color:var(--navy)}
+.elasticity-footnote{font-size:10px;line-height:1.5;color:var(--muted);margin-top:13px}
+@media(max-width:850px){.elasticity-cards{grid-template-columns:repeat(2,1fr)}.elasticity-lower{grid-template-columns:1fr}.elasticity-head{display:block}.elasticity-pill{display:inline-block;margin-top:10px}}
+@media(max-width:480px){.elasticity-cards{gap:8px}.elasticity-card{padding:12px 10px}.elasticity-card[aria-pressed="true"]{padding:11px 9px}.elasticity-card .e-price{font-size:23px}.elasticity-card .e-metrics strong{font-size:11px}.elasticity-section{padding:16px}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div>
+      <div class="eyebrow">Business Mathematics · WAS Group 10</div>
+      <h1>Buffet Pricing Simulator</h1>
+      <p>Move the price slider and see how the report’s short-run model changes estimated covers, revenue, food cost and operating profit for a typical Barbeque Nation India outlet.</p>
+    </div>
+    <div class="tag">MODEL RANGE: ₹500–₹800</div>
+  </div>
+
+  <section class="controls">
+    <div class="panel">
+      <div class="price-row"><label for="priceSlider">Effective buffet price per cover</label><div class="price" id="priceValue">₹699</div></div>
+      <div class="range-wrap">
+        <input class="range" id="priceSlider" type="range" min="500" max="800" step="1" value="699" aria-label="Buffet price slider" />
+        <div class="ticks"><span>₹500</span><span>₹600</span><span>₹700</span><span>₹800</span></div>
+      </div>
+      <div class="quick">
+        <button data-price="599">₹599 offer</button><button data-price="649">₹649 reference</button><button data-price="699">₹699 pilot</button><button data-price="712">₹712 optimum</button><button data-price="749">₹749 scenario</button>
+      </div>
+    </div>
+    <div class="panel price-context">
+      <div class="eyebrow">What moves as price changes?</div>
+      <div class="context-line"><span class="dot"></span><span><strong>Demand:</strong> estimated covers move down as price rises.</span></div>
+      <div class="context-line"><span class="dot" style="background:var(--yellow)"></span><span><strong>Contribution:</strong> more revenue per cover, before food cost.</span></div>
+      <div class="context-line"><span class="dot" style="background:#b9cdb2"></span><span><strong>Profit:</strong> rises, peaks, then falls as volume loss dominates.</span></div>
+      <div class="formula">π(P) = (P − 234.2042) × Q(P) − 75,553.34</div>
+    </div>
+  </section>
+
+  <section class="kpis">
+    <div class="kpi"><div class="label">Estimated covers / day</div><div class="value" id="covers">211.7</div><div class="note">Implied model demand</div></div>
+    <div class="kpi"><div class="label">Daily revenue</div><div class="value" id="revenue">₹147,959</div><div class="note">Price × estimated covers</div></div>
+    <div class="kpi"><div class="label">Operating profit / day</div><div class="value" id="profit">₹22,831</div><div class="note">Revenue − modelled costs</div></div>
+    <div class="kpi"><div class="label">Profit vs ₹649 reference</div><div class="value" id="uplift">+7.7%</div><div class="note" id="upliftNote">Compared with the baseline scenario</div></div>
+  </section>
+
+  <section class="charts">
+    <div class="panel chart-panel"><div class="chart-title">Estimated daily covers vs buffet price</div><svg id="demandChart" class="chart" viewBox="0 0 620 310" role="img" aria-label="Estimated covers by buffet price"></svg></div>
+    <div class="panel chart-panel"><div class="chart-title">Estimated daily operating profit vs buffet price</div><svg id="profitChart" class="chart" viewBox="0 0 620 310" role="img" aria-label="Estimated profit by buffet price"></svg></div>
+  </section>
+
+
+  <section class="panel elasticity-section" aria-labelledby="elasticityTitle">
+    <div class="elasticity-head">
+      <div>
+        <div class="eyebrow">Sensitivity analysis · Four scenarios</div>
+        <h2 id="elasticityTitle">How different elasticity values change the result</h2>
+        <p>Price elasticity measures how strongly customer demand responds to a price change. The report tests four assumptions while keeping the reference price, reference covers, food cost and other operating costs unchanged.</p>
+      </div>
+      <div class="elasticity-pill">SELECT A SCENARIO</div>
+    </div>
+    <div class="elasticity-cards" id="elasticityCards" aria-label="Elasticity scenario comparison"></div>
+    <div class="elasticity-lower">
+      <div class="elasticity-box">
+        <h3>Explore an elasticity assumption</h3>
+        <p>Select an elasticity value to see the demand slope, revised demand equation and resulting optimum.</p>
+        <div class="elasticity-buttons" id="elasticityButtons" aria-label="Choose price elasticity"></div>
+        <div class="elasticity-stats">
+          <div class="elasticity-stat"><span>Demand slope (b)</span><strong id="elasticitySlope">0.431252</strong></div>
+          <div class="elasticity-stat"><span>Optimal price</span><strong id="elasticityOptimal">₹712</strong></div>
+          <div class="elasticity-stat"><span>Estimated covers / day</span><strong id="elasticityCovers">206.1</strong></div>
+          <div class="elasticity-stat"><span>Estimated profit / day</span><strong id="elasticityProfit">₹22,904</strong></div>
+        </div>
+      </div>
+      <div class="elasticity-box">
+        <h3>What changes in the model?</h3>
+        <p id="elasticityExplanation">At elasticity 1.2, the model assumes that demand is relatively sensitive to price. This is the report's base-case assumption.</p>
+        <div class="elasticity-equation" id="elasticityEquation">Q(P) = 513.1182 − 0.431252P</div>
+        <div class="elasticity-takeaway" id="elasticityTakeaway"><strong>Base case:</strong> The report's ₹712 optimum is based on elasticity of 1.2. It should be validated using outlet-level transaction data.</div>
+      </div>
+    </div>
+    <div class="elasticity-footnote">The scenario outputs follow the report's sensitivity analysis and are rounded for display. Lower elasticity means customers are less responsive to price changes; higher elasticity means they are more responsive. These are model scenarios, not actual Barbeque Nation customer-response measurements.</div>
+  </section>
+
+  <section class="readout">
+    <div class="panel callout"><h3>Model benchmark</h3><p>The base-case mathematical optimum is approximately <strong>₹712.02</strong>, producing about <strong>206.1 covers</strong> and <strong>₹22,904 daily operating profit</strong>. The report identifies <strong>₹699</strong> as a practical price to test because its estimated profit is only about ₹73 per day lower.</p></div>
+    <div class="panel"><h3>How to use this during the presentation</h3><p>Move the slider from ₹500 to ₹800. Watch the profit curve’s marker move and compare the trade-off between customer volume and contribution. Use the quick buttons to jump to the report’s scenario prices.</p><div class="links"><a href="Barbeque_Nation_Interactive_Pricing_Model.xlsx">Open companion Excel model ↗</a></div></div>
+  </section>
+
+  <div class="note"><strong>Important modelling caveat:</strong> This is a simplified short-run model, not actual internal Barbeque Nation data or pricing guidance. It uses the report’s assumed price elasticity of 1.2, a derived reference price of ₹649, proxy food costs and calibrated fixed/semi-fixed costs. The report says not to extrapolate outside ₹500–₹800. Validate assumptions using outlet-level point-of-sale and cost data before commercial use.</div>
+</div>
+<script>
+const P0=649, Q0=233.2355, elasticity=1.2, variableFoodCost=234.2042, fixedCosts=75553.34;
+const b=elasticity*Q0/P0, a=Q0+b*P0;
+const q=p=>a-b*p;
+const revenue=p=>p*q(p);
+const food=p=>variableFoodCost*q(p);
+const totalCost=p=>food(p)+fixedCosts;
+const profit=p=>revenue(p)-totalCost(p);
+const baseProfit=profit(P0);
+const optimalPrice=(a+b*variableFoodCost)/(2*b);
+const slider=document.getElementById('priceSlider');
+const money=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+const one=n=>n.toFixed(1);
+
+function chart(svgEl, type, pNow){
+  const W=620,H=310,L=68,R=18,T=25,B=48,pw=W-L-R,ph=H-T-B;
+  const minP=500,maxP=800;
+  const vals=Array.from({length:61},(_,i)=>{const p=500+i*5;return {p,y:type==='demand'?q(p):profit(p)}});
+  const minY=type==='demand'?150:0, maxY=type==='demand'?310:26000;
+  const X=p=>L+(p-minP)/(maxP-minP)*pw;
+  const Y=v=>T+ph-(v-minY)/(maxY-minY)*ph;
+  const selected=type==='demand'?q(pNow):profit(pNow);
+  const xticks=[500,550,600,650,700,750,800], yticks=type==='demand'?[150,190,230,270,310]:[0,5000,10000,15000,20000,25000];
+  let s=`<rect x="0" y="0" width="${W}" height="${H}" rx="12" fill="#fffef8"/>`;
+  yticks.forEach(v=>{let y=Y(v);s+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#e7e3d0" stroke-width="1"/><text x="${L-10}" y="${y+4}" text-anchor="end" font-size="10" fill="#69758b" font-family="Arial">${type==='demand'?v:'₹'+(v/1000)+'k'}</text>`});
+  xticks.forEach(v=>{let x=X(v);s+=`<line x1="${x}" y1="${T}" x2="${x}" y2="${T+ph}" stroke="#efecdf" stroke-width="1"/><text x="${x}" y="${H-18}" text-anchor="middle" font-size="10" fill="#69758b" font-family="Arial">${v}</text>`});
+  s+=`<line x1="${L}" y1="${T+ph}" x2="${W-R}" y2="${T+ph}" stroke="#556a8e" stroke-width="1.5"/><line x1="${L}" y1="${T}" x2="${L}" y2="${T+ph}" stroke="#556a8e" stroke-width="1.5"/>`;
+  const pts=vals.map(o=>`${X(o.p).toFixed(1)},${Y(o.y).toFixed(1)}`).join(' ');
+  s+=`<polyline points="${pts}" fill="none" stroke="#556a8e" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const x=X(pNow), y=Y(selected);
+  s+=`<line x1="${x}" y1="${T}" x2="${x}" y2="${T+ph}" stroke="#f4a4be" stroke-width="2.5" stroke-dasharray="6 5"/><circle cx="${x}" cy="${y}" r="7" fill="#f4a4be" stroke="#303c50" stroke-width="2.4"/>`;
+  const label=type==='demand'?`${one(selected)} covers`:`${money(selected)} profit`;
+  const boxX=Math.min(W-R-126,Math.max(L+3,x-62)); const boxY=Math.max(T+2,y-34);
+  s+=`<rect x="${boxX}" y="${boxY}" width="124" height="24" rx="7" fill="#fff3c0" stroke="#ddcf96"/><text x="${boxX+62}" y="${boxY+16}" text-anchor="middle" font-size="10" font-weight="700" fill="#303c50" font-family="Arial">${label}</text>`;
+  svgEl.innerHTML=s;
+}
+function update(){
+  const p=Number(slider.value), covers=q(p), rev=revenue(p), pr=profit(p), diff=pr-baseProfit, up=diff/baseProfit*100;
+  document.getElementById('priceValue').textContent=money(p);
+  document.getElementById('covers').textContent=one(covers);
+  document.getElementById('revenue').textContent=money(rev);
+  document.getElementById('profit').textContent=money(pr);
+  document.getElementById('uplift').textContent=(up>=0?'+':'')+up.toFixed(1)+'%';
+  document.getElementById('upliftNote').textContent=(up>=0?'Above':'Below')+' the ₹649 reference profit';
+  slider.style.setProperty('--pct',((p-500)/300*100)+'%');
+  chart(document.getElementById('demandChart'),'demand',p);
+  chart(document.getElementById('profitChart'),'profit',p);
+}
+
+const elasticityScenarioValues=[1.0,1.2,1.5,2.0].map(e=>{
+  const slope=e*Q0/P0;
+  const intercept=Q0+slope*P0;
+  const optimum=(intercept+slope*variableFoodCost)/(2*slope);
+  const coversAtOptimum=intercept-slope*optimum;
+  const profitAtOptimum=(optimum-variableFoodCost)*coversAtOptimum-fixedCosts;
+  return {elasticity:e,slope,intercept,optimum,covers:coversAtOptimum,profit:profitAtOptimum};
+});
+const elasticityCards=document.getElementById('elasticityCards');
+const elasticityButtons=document.getElementById('elasticityButtons');
+const compactMoney=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+const scenarioPrice=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+function renderElasticityScenarios(){
+  elasticityCards.innerHTML=elasticityScenarioValues.map(s=>`
+    <button type="button" class="elasticity-card" data-select-elasticity="${s.elasticity}" aria-pressed="${s.elasticity===1.2?'true':'false'}">
+      <div class="e-label"><span>Elasticity ${s.elasticity.toFixed(1)}</span>${s.elasticity===1.2?'<span class="e-badge">BASE CASE</span>':''}</div>
+      <div class="e-price">${scenarioPrice(s.optimum)}</div>
+      <div class="e-caption">Optimal buffet price</div>
+      <div class="e-metrics"><div><span>Covers / day</span><strong>${s.covers.toFixed(1)}</strong></div><div><span>Profit / day</span><strong>${compactMoney(s.profit)}</strong></div></div>
+    </button>`).join('');
+  elasticityButtons.innerHTML=elasticityScenarioValues.map(s=>`<button type="button" data-select-elasticity="${s.elasticity}" aria-pressed="${s.elasticity===1.2?'true':'false'}">${s.elasticity.toFixed(1)}</button>`).join('');
+}
+function selectElasticity(value){
+  const s=elasticityScenarioValues.find(x=>Math.abs(x.elasticity-value)<1e-9);
+  if(!s)return;
+  document.querySelectorAll('[data-select-elasticity]').forEach(el=>el.setAttribute('aria-pressed',String(Number(el.dataset.selectElasticity)===s.elasticity)));
+  document.getElementById('elasticitySlope').textContent=s.slope.toFixed(6);
+  document.getElementById('elasticityOptimal').textContent=scenarioPrice(s.optimum);
+  document.getElementById('elasticityCovers').textContent=s.covers.toFixed(1);
+  document.getElementById('elasticityProfit').textContent=compactMoney(s.profit);
+  const description={
+    '1': 'At elasticity 1.0, customers are less responsive to price changes than in the base case. The model therefore supports a higher optimal price, with fewer covers than the more elastic scenarios.',
+    '1.2': 'At elasticity 1.2, the model uses the report’s base-case assumption. It produces an optimal price of about ₹712, approximately 206.1 covers and ₹22,904 daily profit.',
+    '1.5': 'At elasticity 1.5, customers are more responsive to price changes than in the base case. The optimal price falls, while the model estimates more covers at that lower price.',
+    '2': 'At elasticity 2.0, customers are the most price-sensitive of the four scenarios. The model produces the lowest optimal price and the highest estimated cover volume.'
+  }[String(s.elasticity)];
+  document.getElementById('elasticityExplanation').textContent=description;
+  document.getElementById('elasticityEquation').textContent=`Q(P) = ${s.intercept.toFixed(4)} − ${s.slope.toFixed(6)}P`;
+  const takeaway=s.elasticity===1.2
+    ? '<strong>Base case:</strong> The report’s ₹712 optimum depends on elasticity being 1.2. Validate this assumption using outlet-level transaction data.'
+    : `<strong>Compared with the base case:</strong> The optimal price changes from about ₹712 at elasticity 1.2 to ${scenarioPrice(s.optimum)} at elasticity ${s.elasticity.toFixed(1)}. This shows why the assumed customer response matters.`;
+  document.getElementById('elasticityTakeaway').innerHTML=takeaway;
+}
+elasticityCards.addEventListener('click',event=>{const button=event.target.closest('[data-select-elasticity]');if(button)selectElasticity(Number(button.dataset.selectElasticity));});
+elasticityButtons.addEventListener('click',event=>{const button=event.target.closest('[data-select-elasticity]');if(button)selectElasticity(Number(button.dataset.selectElasticity));});
+renderElasticityScenarios();
+selectElasticity(1.2);
+
+slider.addEventListener('input',update);
+document.querySelectorAll('[data-price]').forEach(btn=>btn.addEventListener('click',()=>{slider.value=btn.dataset.price;update()}));
+update();
+</script>
+</body>
+</html>
